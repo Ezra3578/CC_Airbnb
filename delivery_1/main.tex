@@ -1,0 +1,77 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------------------------
+% Packages
+% ---------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+
+\usepackage[english]{babel}
+
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+
+
+\usepackage[
+    backend=biber,
+    style=apa
+]{biblatex}
+
+%Bibliography
+\addbibresource{references/bibliography.bib}
+
+% ---------------------------------
+% Configuration
+% ---------------------------------
+
+\geometry{
+    left=3cm,
+    right=3cm,
+    top=3cm,
+    bottom=3cm
+}
+
+\onehalfspacing
+
+% ---------------------------------
+% Start of the document
+% ---------------------------------
+
+\begin{document}
+
+\title{Airbnb: Delivery 1}
+\author{Daniel Mateo Ballesteros Molina \\ 20221020102
+\and Santiago Gómez Reyes \\ 2022
+\and Esteban Alexander Bautista Solano \\ 20221020089
+\and Daniel David Cuellar Cangrejo \\ 20221020081
+\and Juan Andrés Jiménez Palomino \\ 20221020087}
+\date{\today}
+
+\maketitle
+
+\tableofcontents
+
+
+%Introduction
+\include{chapters/1_introduction}
+
+%System Description
+\include{chapters/2_system_description}
+
+%Functional Requirements
+\include{chapters/3_functional_requirements}
+
+%Non Functional Requirements
+\include{chapters/4_non_functional_requirements}
+
+%Workload Model
+\include{chapters/5_workload_model}
+
+
+%Bibliography
+\printbibliography
+
+
+\end{document}
