@@ -1,0 +1,55 @@
+\section{System Description}
+
+In the present section, there will be a description of Airbnb system, 
+which will take further the business problem it was designed to solve, as well as its 
+main actors, and how they interact within the system described in the corresponding Use Cases.
+
+Finally, there will be defined the System Boundaries, i.e, what is inside of the scope of our system
+and what is explicitly outside of it.
+
+\subsection{Business Problem}
+
+The problem that Airbnb solves is referred to the fragmented, inefficient and uncertain access to short-term 
+accomodations. It gives people who are in need of a place to stay, and people with those accomodations or 
+properties available. The hosts might find problems finding or reaching potential guests, managing bookings 
+and monetizing after all the stay, and guests might struggle finding said place.
+
+Airbnb provides a platform in which guests are benefited with a large range and access of accomodation options, and hosts
+can get additional income and a wider spectre of possible guests around the world.
+
+Its operational challenge at scale, comes when one must maintain availibility accuracy (concurrence), transaction integrity,
+trust, and service reliability accross a global two-sided marketplace. Also, there might be some problems taking compliance
+into account.
+
+\subsection{Actors}
+
+Taking actors, as the human users and the external services that are interacting with our application, the following 
+schemas describe their role on it, how much the interact with the application, and what could they expect.
+
+%I gotta make em as tables later xD
+\textbf{Human users}
+\begin{itemize}
+    \item \textbf{Visitors}: They browse listing and explore accomodations without having an account. Its interaction 
+                             frequency is high, as they would use the main requirements of the application without counting 
+                             logged in users. They would expect fast searchs, useful filters, accurate prices, clear property
+                             descriptions, the map-base discovery and a simple registration process.
+    \item \textbf{Guests}: 
+    \item \textbf{Hosts}:
+    \item \textbf{Co-hosts and property managers}:
+    \item \textbf{Auditors}:
+    \item \textbf{Trust and safety specialists}:
+    \item \textbf{Administrators}:
+    \item \textbf{Customer Support}:
+\end{itemize}
+
+
+%I gotta make em as tables later xD
+\textbf{External Services}
+\begin{itemize}
+    \item \textbf{Geolocation / Maps API}:
+    \item \textbf{Payment Gateway}:
+    \item \textbf{Authentication Service}:
+    \item \textbf{Identity Verification Service}:
+    \item \textbf{Notification Service}:
+    \item \textbf{Fraud Detection Service and Risk Management}:
+\end{itemize}
