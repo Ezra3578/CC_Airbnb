@@ -13,10 +13,15 @@
 \usepackage{geometry}
 \usepackage{setspace}
 
+\usepackage{longtable}
+\usepackage{array}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
 
+\usepackage{csquotes}
 \usepackage[
     backend=biber,
-    style=apa
+    sorting=none,
+    style=numeric
 ]{biblatex}
 
 %Bibliography
@@ -33,7 +38,7 @@
     bottom=3cm
 }
 
-\onehalfspacing
+\onehalfspacing{}
 
 % ---------------------------------
 % Start of the document

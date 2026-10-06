@@ -1,0 +1,332 @@
+\section{Workload Model}
+
+In the present section, the workload model of Airbnb will be described, giving the different parameters with 
+its corresponding value. Each value is justified with its proper reference, the data that wasn't publicly available
+was estimated taking into account other parameters and data, its justification will be found under the corresponding
+table.
+
+% -----TRAFFIC AND LOAD-----
+\subsection{Traffic and load}
+
+The following table shows the value of the traffic that Airbnb experiments.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\ 
+    \hline
+    \endfirsthead%
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\ 
+    \hline
+    \endhead%
+
+    Average requests/hour &
+    $\approx 934{,}000$ page requests/hour \cite{semrush_airbnb_2026}\\
+    \hline
+
+    Peak requests/hour &
+    $\approx 9.3$ million page requests/hour \cite{semrush_airbnb_2026, airbnb_engineering_traffic_spikes} \\
+    \hline
+
+    Peak duration &
+    $\approx 5$ minutes \cite{airbnb_engineering_traffic_spikes} \\
+    \hline
+
+    Burst rate &
+    $10\times$ normal; $20\times$ stress case \cite{airbnb_engineering_traffic_spikes} \\
+    \hline
+
+    Seasonal traffic multiplier &
+    $\approx 1.1\times$ \cite{airbnb_10k_2025} \\
+    \hline
+
+\end{longtable}
+
+The value of average requests/hour was estimated using Semrush, which reports 93.03M monthly visits and 7.23 pages/visit. 
+$93.03M \times 7.23 / 720 \approx 934{,}000$ page requests/hour. This represents observable web page 
+traffic, not Airbnb's complete internal service-to-service traffic \cite{semrush_airbnb_2026}.
+
+The peak requests/hour were estimated. Taking into account that the average web workload above is multiplied by a 
+conservative $10\times$ burst factor. Airbnb engineering has documented traffic spikes of approximately 
+$10$--$20\times$ during severe events. $934{,}000 \times 10 \approx 9.34$ million requests/hour 
+\cite{semrush_airbnb_2026,airbnb_engineering_traffic_spikes}.
+
+The burst rate was derived from Airbnb engineering, which has documented QPS increases in the $10$--$20\times$ range. 
+$10\times$ is used as the normal capacity-planning burst and $20\times$ as an extreme stress scenario.
+Source: Airbnb Engineering \cite{airbnb_engineering_traffic_spikes}.
+
+The seasonal traffic multiplier was estimated. Airbnb states that its business is seasonal and that Nights and 
+Seats Booked are generally highest in Q1--Q3, with Q3 being the peak travel season in North America and EMEA. 
+A $1.1\times$ multiplier provides a conservative approximation of normal seasonal variation without treating the 
+annual peak as an outage-level burst \cite{airbnb_10k_2025}.
+
+% -----USER ACTIVITY-----
+\subsection{User Activity}
+
+The following table shows the value of the user activity in the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+
+    Average session duration & 
+    10 min 42 s \cite{semrush_airbnb_2026} \\ 
+    \hline 
+    
+    Requests per session & 
+    7.23 page requests/session \cite{semrush_airbnb_2026} \\ 
+    \hline 
+    
+    Concurrent users (average) & 
+    $\approx 23{,}000$ web sessions \cite{semrush_airbnb_2026} \\ 
+    \hline 
+    
+    Concurrent users (peak) & 
+    $\approx 60{,}000$ web sessions \cite{semrush_airbnb_2026} \\ 
+    \hline 
+    
+\end{longtable}
+
+The average session duration was recorded from a third-party measurement. Semrush reports an average visit 
+duration of 10:42 for airbnb.com in August 2026 \cite{semrush_airbnb_2026}. 
+
+The amount of requests per session was used from a third-party measurement. Semrush reports 7.23 pages per visit. 
+This is interpreted as user-facing page requests rather than internal microservice requests \cite{semrush_airbnb_2026}.
+
+The concurrent users were estimated, using approximately 93.03M monthly visits and an average session duration of 
+10.7 minutes: \[ \frac{93.03M}{30.4\ days}\times\frac{10.7\ min}{1440\ min/day} \approx 22{,}800 \] 
+This estimates simultaneously active web sessions and excludes users interacting exclusively through native applications.
+Source: Semrush traffic and session-duration data \cite{semrush_airbnb_2026}.
+
+The peak of the concurrent users was estimated. A peak concurrency factor of approximately $2.5\times$ the average 
+is used: $22{,}800\times2.5\approx57{,}000$, rounded to approximately 60,000. The factor is intentionally lower than 
+the $10\times$ request burst because more requests per user can occur without a proportional increase in active users
+\cite{semrush_airbnb_2026}.
+
+
+% -----Read/Write ratio----- 
+\subsection{Read and Write Ratio}
+
+The following table shows the value of the user read and write ratio of the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+
+    Read/write ratio & 
+    $\approx 95:5$ \cite{airbnb_engineering_mussel} \\ 
+    \hline 
+    
+    Request distribution by endpoint & 
+    Search/browse 60\%; listing/details 20\%; 
+    account/auth 8\%; booking/payment 5\%; 
+    messaging 4\%; other 3\%~\cite{educative_airbnb_system_design} \\ 
+    \hline 
+    
+    Cache hit ratio & 
+    $\approx 85\%$ of cacheable reads~\cite{educative_airbnb_system_design} \\ 
+    \hline
+
+    
+\end{longtable}
+
+The read and write ratio was estimated from Airbnb internal infrastructure. Airbnb's Mussel key-value store reports 
+average read QPS above 800k and write QPS above 35k, corresponding to approximately 96:4. A rounded 95:5 ratio 
+is used for the general workload model because search and discovery are substantially more read-intensive than 
+booking and data modification \cite{airbnb_engineering_mussel}. 
+
+The request distribution was estimated. The distribution emphasizes search because Airbnb system-design and engineering
+material identify search/discovery as the dominant read-heavy workload, while booking/payment represents a smaller 
+but consistency-critical workload. Percentages are architectural assumptions for capacity modeling 
+\cite{educative_airbnb_system_design}.
+
+The cache hit ratio was estimated. Airbnb publicly documents extensive caching and derived-data infrastructure, 
+but does not publish a single platform-wide cache hit ratio. An 85\% hit ratio is a reasonable architectural assumption 
+for frequently accessed listing/search data and should be treated as a tunable model parameter 
+\cite{educative_airbnb_system_design}.
+
+
+% -----PERFORMANCE AND RELIABILITY----- 
+\subsection{Performance and reliability}
+
+The following table shows the value of the performance of the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+
+    Availability & 
+    $\geq 99.9\%$ \cite{airbnb_engineering_mussel} \\ 
+    \hline 
+    
+    Response time (p95) & 
+    $\approx 1.5$ s user-facing target \cite{airbnb_engineering_mussel,educative_airbnb_system_design} \\ 
+    \hline 
+    
+\end{longtable}
+
+The availability was used from a report for a major Airbnb infrastructure component. Airbnb's Mussel service 
+reports greater than 99.9\% availability. This value is used as a conservative platform workload target, 
+but cannot be described as an officially published end-to-end Airbnb SLA \cite{airbnb_engineering_mussel}.
+
+The response time, within a 95 percentile was estimated. Even though Airbnb does not publish a global end-to-end 
+p95. Mussel reports average p95 read latency below 8 ms, demonstrating backend-storage performance, while an end-user 
+request traverses multiple services, networks, caches and rendering layers. Therefore, approximately 1.5 s is used 
+as a user-facing workload target rather than incorrectly treating 8 ms as total request latency
+\cite{airbnb_engineering_mussel,educative_airbnb_system_design}.
+
+% -----DATA----- 
+\subsection{Data}
+
+The following table shows the value of the data growth in the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+    
+    Data growth & 
+    $\approx 8$--$10\%$/year \cite{airbnb_10k_2025} \\ 
+    \hline 
+    
+\end{longtable}
+
+The data growth was estimated from reported business growth. Airbnb reported 533M Nights and Seats Booked in 
+2025 versus 492M in 2024, an 8\% increase. A baseline of 8--10\% annual growth is therefore used for workload/data 
+planning, recognizing that storage growth will not necessarily equal booking growth \cite{airbnb_10k_2025}.
+
+
+% -----MEDIA----- 
+\subsection{Media}
+
+The following table shows the value of the information related to the media files in the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+    
+    Maximum payload size & 
+    10 MB/photo; 100 MB/video \cite{airbnb_resource_center_photos, airbnb_help_video_verification}\\ 
+    \hline 
+    
+    File upload frequency & 
+    $\approx 9{,}000$ photos/hour \cite{searchlogistics_airbnb_statistics, airbnb_resource_center_photos}\\ 
+    \hline 
+    
+\end{longtable}
+
+The file upload frequency was estimated. Considering Airbnb has more than 9M active listings according to current 
+third-party industry data. Assuming roughly one photo update per listing per year and several photos per update produces 
+an order of magnitude of several thousand photo uploads/hour; 9,000/hour is used as a conservative media-workload estimate
+\cite{searchlogistics_airbnb_statistics, airbnb_resource_center_photos}.
+
+% -----SEARCH----- 
+\subsection{Search}
+
+The following table shows the value of the searches in the application, and their complexity.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+    
+    Search complexity & 
+    High; geo-search + dates + availability + price + filters + ranking/personalization
+    \cite{educative_airbnb_system_design} \\ 
+    \hline
+    
+\end{longtable}
+
+The search complexity was oriented as qualitative analysus, due to the many procedures it requires. Airbnb search must 
+combine geographic location, dates, availability, pricing, amenities and ranking/personalization. This is therefore 
+a multi-dimensional read-heavy workload requiring indexes, caching and precomputed/derived data 
+\cite{educative_airbnb_system_design}. 
+
+
+% -----GEOLOCATION----- 
+\subsection{Geography}
+
+The following table shows the value of the geography scope in the application.
+
+\begin{longtable}{|p{0.27\textwidth}|p{0.55\textwidth}|}
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Parameter} & 
+    \textbf{Value} \\
+    \hline
+    \endhead
+    
+    Geographic scope & 
+    More than 220 countries and regions \cite{airbnb_10k_2025} \\ 
+    \hline 
+    
+    Traffic by region & 
+    North America 30\%; EMEA 40\%; Latin America 17\%; Asia Pacific 13\% \cite{airbnb_10k_2025} \\ 
+    \hline
+    
+\end{longtable}
+
+The traffic by region was used from a reported business-workload proxy. Airbnb reports 2025 Nights and Seats 
+Booked by host-listing region: North America 158M (30\%), EMEA 215M (40\%), Latin America 90M (17\%), and 
+Asia Pacific 70M (13\%). These figures describe booking activity rather than HTTP traffic, so they should be identified
+as a traffic-distribution proxy \cite{airbnb_10k_2025}.

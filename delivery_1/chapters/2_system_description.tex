@@ -7,6 +7,7 @@ main actors, and how they interact within the system described in the correspond
 Finally, there will be defined the System Boundaries, i.e, what is inside of the scope of our system
 and what is explicitly outside of it.
 
+% -------BUSINESS PROBLEM-------
 \subsection{Business Problem}
 
 The problem that Airbnb solves is referred to the fragmented, inefficient and uncertain access to short-term 
@@ -21,35 +22,742 @@ Its operational challenge at scale, comes when one must maintain availibility ac
 trust, and service reliability accross a global two-sided marketplace. Also, there might be some problems taking compliance
 into account.
 
+
+% -------ACTORS-------
 \subsection{Actors}
 
 Taking actors, as the human users and the external services that are interacting with our application, the following 
 schemas describe their role on it, how much the interact with the application, and what could they expect.
 
-%I gotta make em as tables later xD
-\textbf{Human users}
+\subsubsection{Human users}
+\begin{longtable}{|L{0.15\textwidth}|L{0.27\textwidth}|L{0.25\textwidth}|L{0.27\textwidth}|}
+    \hline
+    \textbf{User} &
+    \textbf{Role} &
+    \textbf{Interaction Frequency} &
+    \textbf{Expectations Regarding the System} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{User} &
+    \textbf{Role} &
+    \textbf{Interaction Frequency} &
+    \textbf{Expectations Regarding the System} \\
+    \hline
+    \endhead
+
+    \textbf{Visitors} &
+    They browse listing and explore accomodations without having an account. &
+    Their interaction frequency is high, as they would use the main requirements of the application without counting 
+    logged in users. &
+    They would expect fast searches, useful filters, accurate prices, clear property descriptions, the map-base 
+    discovery and a simple registration process. \\
+    \hline
+
+    \textbf{Guests} &
+    They search for accomodation, book their stays, pay, communicate with hosts and manage their reservations. &
+    Their interaction is high during the accomodation discovery and booking. After their stay, it would be more 
+    ocassional. &
+    They might expect accurate availability, transparent pricings, reliable confirmations, clear cancellation and 
+    effective support. \\
+    \hline
+
+    \textbf{Hosts} &
+    They publish and manage their property listings, set prices and availability, accept or manage reservations, 
+    communicate with the guests and receive payouts. &
+    Their interaction frequency is frequent, daily-like, it would depend a lot on the reservations, but fewer than 
+    visitors and guests. &
+    They would expect an easy listing management, synchronized calendars (to reduce concurrence), pricing controls, 
+    timely notifications, secure payouts and booking management. \\
+    \hline
+
+    \textbf{Auditors} &
+    They review transactions, access records, verify compliance and examine audit trails. &
+    Their interaction frequency is periodic, with more frequency when there is a programmed audit or investigation. &
+    They would expect accurate and traceable records, controlled access to sensitive data, reliable reports and 
+    evidence of relevant changes and transactions. \\
+    \hline
+
+    \textbf{Administra-tors} &
+    They configure platform settings, manage accounts and permissions, oversee listings, and supervise operational 
+    processes. &
+    The interaction frequency is frequent during operational work, it would be expected to be daily. &
+    They would expect to have role-based access control, monitoring tools, reliable reporting, secure configuration 
+    and traceability of administrative actions. \\
+    \hline
+
+    \textbf{Customer Support} &
+    They assist guests and hosts with booking issues, refunds, complaints and account access. &
+    Their interaction frequency is high during working shifts, peaking at incidents or high demand on the application. &
+    They would expect fast access to reservation history, communication records, relevant policies and clear 
+    escalation procedures. \\
+    \hline
+
+    \caption{Human users roles, interaction frequency and system expectations}
+    \label{tab:human_users}
+\end{longtable}
+
+
+\subsubsection{External Services}
+\begin{longtable}{|L{0.15\textwidth}|L{0.27\textwidth}|L{0.25\textwidth}|L{0.27\textwidth}|}
+    \hline
+    \textbf{User} &
+    \textbf{Role} &
+    \textbf{Interaction Frequency} &
+    \textbf{Expectations Regarding the System} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{User} &
+    \textbf{Role} &
+    \textbf{Interaction Frequency} &
+    \textbf{Expectations Regarding the System} \\
+    \hline
+    \endhead
+
+    \textbf{Geoloca-tion / Maps API} &
+    It's in charge of converting addresses and coordinates, displaying properties on maps and supporting 
+    location-based searches. &
+    Its interaction would be frequent during map browsing and location searches. &
+    The expectations would be to get accurate coordinates, responsive queries, consistent location data and high 
+    availability. \\
+    \hline
+
+    \textbf{Payment Gateway} &
+    It's in charge of processing guests payments and refunds. &
+    Its interaction would be event-driven like, being invoked during the chekout, refunds and other transactions, 
+    making it less active than other services. &
+    The expectations rely on having a secure processing, reliable transactions and clear handling of failed and 
+    pending transactions. \\
+    \hline
+
+    \textbf{Authenti-cation Service} &
+    It's in charge of athenticating users, managing sessions and tokens. &
+    The interaction frequency would be higher during login and session renewal, and less when sessions remain 
+    active. &
+    The expectations would be to secure credential handling, have a reliable access control, low latency and 
+    protection against unathorized access. \\
+    \hline
+
+    \textbf{Notifica-tion Service} &
+    It's in charge of delivering booking confirmations, reservation changes, reminders, messages and payment alerts. &
+    Its interaction would also be event-driven like, peaking during booking peaks. &
+    The expectations would be to deliver them on time, have a tracking on delivery status, preventing duplicates and 
+    channel specific-failure handling. \\
+    \hline
+
+    \caption{External users roles, interaction frequency and system expectations}
+    \label{tab:external_services}
+\end{longtable}
+
+% -------SYSTEM DIAGRAM-------
+\subsection{System Diagram}
+
+Here it is a description of the system into a diagram, which shows how the actors interact within the application in a 
+graphic way. It gives a workflow with inputs and outputs and clear interaction between the system components.
+
+\begin{figure}[h]
+    \centering
+    \includegraphics[width=0.75\linewidth]{images/AirbnbSystemDesign.jpeg}
+    \caption{System Diagram.}
+    \label{fig:system_diagram}
+\end{figure}
+
+% -------MAIN USE CASES-------
+
+\subsection{Main Use Cases}
+
+The following use cases were the most representative interactions of the system defined, focusing on the main business 
+processes of the platform rather than technical operations performed by external services, i.e., supporting services 
+such as the Payment Gateway, Maps Service, Authentication Service, and Notification Service participate in these use 
+cases when required.
+
+\subsubsection{Account Management}
+
+\paragraph{Register}
+
 \begin{itemize}
-    \item \textbf{Visitors}: They browse listing and explore accomodations without having an account. Its interaction 
-                             frequency is high, as they would use the main requirements of the application without counting 
-                             logged in users. They would expect fast searchs, useful filters, accurate prices, clear property
-                             descriptions, the map-base discovery and a simple registration process.
-    \item \textbf{Guests}: 
-    \item \textbf{Hosts}:
-    \item \textbf{Co-hosts and property managers}:
-    \item \textbf{Auditors}:
-    \item \textbf{Trust and safety specialists}:
-    \item \textbf{Administrators}:
-    \item \textbf{Customer Support}:
+    \item \textbf{Actors:} Guest, Host, Authentication Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The user does not already have an account with the provided credentials.
+        \item The registration service is available.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The user selects the registration option.
+        \item The system requests the required registration information.
+        \item The user provides the requested information.
+        \item The system validates the information.
+        \item The Authentication Service creates and validates the user credentials.
+        \item The system creates the user account.
+        \item The system confirms that the registration was successful.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The provided information is invalid or incomplete.
+        \item The provided email or credentials are already associated with an existing account.
+        \item The Authentication Service is unavailable.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The user's credentials are registered with the authentication mechanism.
+    \end{itemize}
 \end{itemize}
 
 
-%I gotta make em as tables later xD
-\textbf{External Services}
+\paragraph{Log In}
+
 \begin{itemize}
-    \item \textbf{Geolocation / Maps API}:
-    \item \textbf{Payment Gateway}:
-    \item \textbf{Authentication Service}:
-    \item \textbf{Identity Verification Service}:
-    \item \textbf{Notification Service}:
-    \item \textbf{Fraud Detection Service and Risk Management}:
+    \item \textbf{Actors:} Guest, Host, Administrator, Customer Support, Authentication Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The user has an existing account.
+        \item The authentication service is available.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The user enters their credentials.
+        \item The system sends the credentials to the Authentication Service.
+        \item The Authentication Service validates the credentials.
+        \item The system creates an authenticated session.
+        \item The system grants access according to the user's role.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The credentials are invalid.
+        \item The Authentication Service is unavailable.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The user is authenticated.
+    \end{itemize}
 \end{itemize}
+
+
+\subsubsection{Accommodation Discovery}
+
+\paragraph{Search Accommodation}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Maps Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The accommodation search service is available.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The guest enters a destination or location.
+        \item The guest specifies optional dates, number of guests, and search criteria.
+        \item The system queries available accommodations.
+        \item The system applies the selected filters and criteria.
+        \item The Maps Service provides geographical information when required.
+        \item The system displays the matching accommodations.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item No accommodations match the search criteria.
+        \item The requested location cannot be resolved.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The guest receives a list of accommodations matching the search criteria.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{View Accommodation Details}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Maps Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The accommodation exists and is available for viewing.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The guest selects an accommodation from the search results.
+        \item The system retrieves pricing, availability, amenities, and ratings.
+        \item The Maps Service provides the location information when required.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The accommodation is no longer available.
+        \item The requested accommodation information cannot be retrieved.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The guest can review the accommodation information.
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Reservation and Guest Experience}
+
+\paragraph{Book Accommodation}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Host, Authentication Service, Payment Gateway, Notification Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The guest is authenticated.
+        \item The accommodation is active.
+        \item The selected dates are available.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The guest selects an accommodation and dates.
+        \item The system verifies availability.
+        \item The system calculates the reservation price.
+        \item The guest confirms the reservation.
+        \item The system requests payment processing.
+        \item The Payment Gateway processes the transaction.
+        \item The system creates the reservation.
+        \item The system updates the accommodation availability.
+        \item The Notification Service sends the reservation confirmation.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The accommodation becomes unavailable before confirmation.
+        \item The payment is rejected.
+        \item The payment remains pending.
+        \item The reservation cannot be created.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The reservation is registered with its corresponding status.
+        \item The accommodation availability is updated.
+        \item The guest and host receive the corresponding notification.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Cancel Reservation}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Host, Payment Gateway, Notification Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The reservation exists.
+        \item The reservation can still be cancelled according to its cancellation policy.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The user selects the reservation to cancel.
+        \item The system verifies the cancellation conditions.
+        \item The system changes the reservation status.
+        \item The system updates the accommodation availability.
+        \item The system determines whether a refund is applicable.
+        \item The Payment Gateway processes the refund when applicable.
+        \item The Notification Service sends the cancellation notification.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The reservation cannot be cancelled under its current conditions.
+        \item The refund cannot be processed.
+        \item The cancellation notification cannot be delivered.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The reservation is marked as cancelled.
+        \item The accommodation availability is updated.
+        \item The applicable refund is registered.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Communicate with Host or Guest}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Host, Notification Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The user is authenticated.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The user selects the conversation.
+        \item The user writes and sends a message.
+        \item The system stores the message.
+        \item The Notification Service notifies the receiver.
+        \item The receptor receives the message.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The receptor cannot be contacted.
+        \item The message cannot be delivered.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The message is stored in the corresponding conversation.
+        \item The receptor is notified when possible.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Rate Accommodation}
+
+\begin{itemize}
+    \item \textbf{Actor:} Guest.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The guest has completed an eligible reservation.
+        \item The guest has not already submitted a rating for the reservation.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The guest selects the completed reservation.
+        \item The system displays the rating form.
+        \item The guest provides a rating and optional comments.
+        \item The system validates and stores the rating.
+        \item The system updates the accommodation's rating information.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The reservation is not eligible for rating.
+        \item The guest has already submitted a rating.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The accommodation's rating information is updated.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Report a Problem}
+
+\begin{itemize}
+    \item \textbf{Actors:} Guest, Host, Customer Support.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The user is authenticated.
+        \item The reported issue can be associated with a reservation, accommodation, or account.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The user selects the report option.
+        \item The user provides the relevant information.
+        \item The system creates a support case.
+        \item Customer Support receives the case.
+        \item The system notifies the user of the case status.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The provided information is incomplete.
+        \item The reported issue cannot be associated with the provided information.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item A support case is created processed by Customer Support.
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Host Management}
+
+\paragraph{Publish Accommodation}
+
+\begin{itemize}
+    \item \textbf{Actors:} Host, Maps Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The host is authenticated.
+        \item The host has the required information to create a listing.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The host selects the option to publish an accommodation.
+        \item The host enters the accommodation information.
+        \item The Maps Service validates or resolves the location.
+        \item The system validates the information.
+        \item The system creates the accommodation listing.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item Required information is missing.
+        \item The location cannot be resolved.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The accommodation listing is stored.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Manage Accommodation Listing}
+
+\begin{itemize}
+    \item \textbf{Actors:} Host, Maps Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The host is authenticated.
+        \item The accommodation belongs to the host.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The host selects an accommodation listing.
+        \item The host modifies its information, pricing, or availability.
+        \item The system validates the changes.
+        \item The Maps Service updates geographical information when required.
+        \item The system stores the changes.
+        \item The system updates the listing information.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The provided information is invalid.
+        \item The requested dates conflict with existing reservations.
+        \item The location information cannot be validated.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The accommodation listing contains the updated information.
+        \item Existing reservations remain protected from incompatible changes.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Manage Reservations}
+
+\begin{itemize}
+    \item \textbf{Actor:} Host.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The host is authenticated.
+        \item The host has one or more reservations associated with their accommodations.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The host accesses their reservations.
+        \item The system displays the reservations and their current status.
+        \item The host selects a reservation.
+        \item The host performs an available management action.
+        \item The system validates the action.
+        \item The system updates the reservation status when applicable.
+        \item The Notification Service informs the affected users.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The reservation status does not allow the requested action.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The reservation reflects the performed action.
+        \item The affected users are notified when applicable.
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Administration}
+
+\paragraph{Manage Users}
+
+\begin{itemize}
+    \item \textbf{Actors:} Administrator.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The administrator is authenticated and authorized.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The administrator searches for a user.
+        \item The system displays the user's information and status.
+        \item The administrator selects an administrative action.
+        \item The system applies the requested action.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The administrator does not have sufficient permissions.
+        \item The user cannot be found.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The action is recorded.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Manage Accommodations}
+
+\begin{itemize}
+    \item \textbf{Actors:} Administrator.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item The administrator is authenticated and authorized.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item The administrator searches for an accommodation.
+        \item The system displays the accommodation information and status.
+        \item The administrator selects an administrative action.
+        \item The system validates the administrator's permissions.
+        \item The system applies the requested action.
+        \item The system records the administrative action.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The accommodation cannot be found.
+        \item The administrator does not have sufficient permissions.
+        \item The requested action is not permitted.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The accommodation reflects the administrative action.
+        \item The action is recorded for traceability.
+    \end{itemize}
+\end{itemize}
+
+
+\subsubsection{Customer Support}
+
+\paragraph{Manage Support Cases}
+
+\begin{itemize}
+    \item \textbf{Actors:} Customer Support, Guest, Host.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item A support case exists.
+        \item Customer Support is authenticated and authorized.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item Customer Support accesses the case.
+        \item The system displays the related user, reservation, and case information.
+        \item Customer Support investigates and communicates the reported issue with the affected
+              user.
+        \item The case status is updated.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item Additional information is required from the user.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The support case has an updated status.
+        \item The actions taken by Customer Support are recorded.
+    \end{itemize}
+\end{itemize}
+
+
+\paragraph{Handle Refunds}
+
+\begin{itemize}
+    \item \textbf{Actors:} Customer Support, Guest, Payment Gateway, Notification Service.
+    
+    \item \textbf{Preconditions:}
+    \begin{itemize}
+        \item A reservation or transaction eligible for a refund exists.
+        \item Customer Support is authenticated and authorized.
+    \end{itemize}
+    
+    \item \textbf{Main Flow:}
+    \begin{enumerate}
+        \item Customer Support accesses the relevant case or reservation.
+        \item The system determines the applicable refund conditions.
+        \item Customer Support confirms the refund.
+        \item The system sends the refund request to the Payment Gateway.
+        \item The Payment Gateway processes the refund.
+        \item The system records the refund status.
+        \item The user is notified of the result.
+    \end{enumerate}
+    
+    \item \textbf{Alternative Flows:}
+    \begin{itemize}
+        \item The transaction is not eligible for a refund.
+        \item The refund remains pending.
+    \end{itemize}
+    
+    \item \textbf{Postconditions:}
+    \begin{itemize}
+        \item The refund is recorded with its corresponding status.
+        \item The affected user is notified.
+    \end{itemize}
+\end{itemize}
+
+
+% -----BOUNDARIES-----
+\subsection{System Boundaries}
+
+The system boundary is defined around the core rental marketplace, including the capabilities required to 
+publish, discover, and manage rental agreements between hosts and guests. The system includes rental information such 
+as pricing, dynamic pricing rules, dates, check-in and check-out agreements, terms of use, and specific guest conditions. 
+It also includes the host interface for publishing and managing properties, including percentage-based charges, and 
+the guest interface for searching and reviewing available rentals. The system must also provide authentication and 
+security, as well as the raw rental listing required to support the marketplace. Map-based catalog visualization, 
+system filters, and favorites are considered within the boundary as secondary capabilities that support the accommodation 
+discovery process.
+
+The boundary also includes capabilities classified as ``Could Have'' where they involve the platform's own 
+operational functionality, particularly administration, monitoring, and auditing, including the visualization of 
+external transactions. Customer support is likewise considered within the system boundary, although it is not part of 
+the fundamental rental workflow. The payment gateway, however, is treated as an external system: payment integration 
+may be included as a future capability, but the actual financial transaction processing is performed outside the system. 
+Similarly, external authentication or other third-party services may interact with the platform without becoming part 
+of its internal scope.
+
+The system explicitly excludes cleaning, maintenance, and other third-party property services, which were classified 
+as ``Won't Have''. These activities may be relevant to the real-world rental process, but they are not managed by the 
+application itself. More generally, the system boundary ends at the point where an external organization or service 
+performs an operational activity that the application does not manage. The details of each included capability, including 
+its functional behavior and requirements, will be specified later in the functional requirements section.

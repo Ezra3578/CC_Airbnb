@@ -1,0 +1,125 @@
+\section{Functional Requirements}
+
+In this section, there are presented 10 functional requirements describing what the system must do. They are focused 
+to fulfill all of the required characteristics. 
+
+
+\subsection{Rental Management}
+
+Here are described some funtional requirements related to rental management.
+
+
+\begin{longtable}{|p{0.17\textwidth}|p{0.75\textwidth}|}
+    \hline
+    \textbf{ID} & 
+    \textbf{Functional Requirement} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{ID} & \textbf{Functional Requirement} \\
+    \hline
+    \endhead
+
+    FR01 & 
+    The system shall allow hosts to publish rental properties by providing the required property information, 
+    pricing, availability dates, and usage conditions. \\
+    \hline
+
+    FR02 &
+    The system shall allow hosts to manage their published rental properties by modifying their property information, 
+    pricing, availability, and usage conditions while preserving existing reservations. \\
+    \hline
+
+    FR03 &
+    The system shall calculate the rental price for a reservation according to the configured pricing rules and 
+    applicable dynamic rates for the selected dates. \\
+    \hline
+
+    FR04 &
+    The system shall allow guests to select rental dates and the number of guests before creating a reservation, 
+    subject to the property's configured availability and capacity. \\
+    \hline
+
+    FR05 &
+    The system shall record check-in and check-out agreements for each confirmed reservation before the reservation 
+    is completed. \\
+    \hline
+
+    FR06 &
+    The system shall allow hosts to define specific conditions for guests, including guest capacity and additional 
+    conditions associated with extra charges, before publishing a rental property. \\
+    \hline
+
+    \caption{Rental Management Requirements}
+
+    \label{tab:rm_fr}
+
+\end{longtable}
+
+
+\subsection{Accommodation Search}
+
+Here are described the funtional requirements related to accommodation search.
+
+
+\begin{longtable}{|p{0.17\textwidth}|p{0.75\textwidth}|}
+    \hline
+    \textbf{ID} & 
+    \textbf{Functional Requirement} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{ID} & \textbf{Functional Requirement} \\
+    \hline
+    \endhead
+
+    FR07 &
+    The system shall allow guests to search for rental properties using destination, rental dates, and number 
+    of guests as search criteria. \\
+    \hline
+
+    FR08 &
+    The system shall display the raw rental listing information for each available property returned by a search, 
+    including its location, price, availability, and configured conditions. \\
+    \hline
+
+    \caption{Accommodation Search Requirements}
+    \label{tab:as_fr}
+
+\end{longtable}
+
+
+\subsection{Security and Authentication}
+
+Here are described the funtional requirements related to security and authentication.
+
+
+\begin{longtable}{|p{0.17\textwidth}|p{0.75\textwidth}|}
+    \hline
+    \textbf{ID} & 
+    \textbf{Functional Requirement} \\
+    \hline
+    \endfirsthead
+
+    \hline
+    \textbf{ID} & 
+    \textbf{Functional Requirement} \\
+    \hline
+    \endhead
+
+    FR09 &
+    The system shall authenticate registered users by validating their credentials before granting access to 
+    protected system functionality. \\
+    \hline
+
+    FR10 & 
+    The system shall restrict access to protected functionality according to the authenticated user's assigned 
+    role. \\
+    \hline
+
+    \caption{Security ad Authentication Requirements}
+    \label{tab:sa_fr}
+
+\end{longtable}
