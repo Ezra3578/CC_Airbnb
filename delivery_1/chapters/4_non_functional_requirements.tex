@@ -1,0 +1,84 @@
+\section{Non-Functional Requirements}
+
+In this section, there will be defined the Non-Functional Requirements that the system must achieve and support. The metrics
+where used from the following decription of Airbnb's Workload Model. For its simulation, values will vary, as it is just a
+``shorter'' version of the application, which will take into account its basic funcionalities.
+
+\begin{longtable}{|p{0.12\textwidth}|p{0.70\textwidth}|}
+    \hline
+    \textbf{ID} & 
+    \textbf{Requirement} \\
+    \hline
+    \endfirsthead%
+
+    \hline
+    \textbf{ID} & 
+    \textbf{Requirement} \\
+    \hline
+    \endhead%
+
+    NFR-01 &
+    The system shall support more than 220 countries and regions, with approximately 23,000 concurrent active users under 
+    normal operating conditions and approximately 60,000 concurrent active users during peak conditions. \\
+    \hline
+
+    NFR-02 &
+    The system shall support an average workload of approximately 934,000 requests per hour under normal operating 
+    conditions. \\
+    \hline
+
+    NFR-03 &
+    The system shall support a peak workload of approximately 9.3 million requests per hour during peak operating 
+    periods. \\
+    \hline
+
+    NFR-04 &
+    The system shall sustain peak workloads for periods of approximately 5 minutes without degradation below the defined 
+    performance and availability targets. \\
+    \hline
+
+    NFR-05 &
+    The system shall process at least 95\% of user-facing requests within approximately 1.5 seconds at the 95th percentile 
+    under normal operating conditions. \\
+    \hline
+
+    NFR-06 &
+    The system shall maintain an availability of at least 99.9\%, corresponding to no more than approximately 43.2 minutes 
+    of unavailability per calendar month. \\
+    \hline
+
+    NFR-07 &
+    The system shall support an initial data volume of approximately 1 GB and accommodate an estimated annual data growth 
+    of approximately 8--10\%. \\
+    \hline
+
+    NFR-08 &
+    The system shall accommodate annual data growth of approximately 8--10\% of the preceding year's stored data volume 
+    without requiring architectural changes to support the projected workload. \\
+    \hline
+
+    NFR-09 &
+    The system shall serve users across more than 220 countries and regions and shall distribute its infrastructure and 
+    traffic-handling mechanisms geographically to minimize latency for users in North America, EMEA, Latin America, and 
+    Asia Pacific. \\
+    \hline
+
+    \caption{Non-Functional Requirements}
+    \label{tab:nfr}
+
+\end{longtable}
+
+The Airbnb values in the previous table represent the scale of the real platform, so they would be unnecessarily large 
+for a small academic simulation. For this project, the workload will be scaled down to 100 registered users, with 
+approximately 10 concurrent active users under normal conditions and 25 during peak conditions. The simulation will 
+generate approximately 500 requests per hour during normal operation and up to 1,200 requests per hour during peak 
+periods, with peak periods modeled as lasting approximately 5 minutes. The response-time target will be 95th percentile 
+below 2 seconds, while the system will target 99\% availability, which is more appropriate for a small local or academic 
+deployment than Airbnb's production-scale availability target.
+
+For data and geographic scope, the simulation will initially contain approximately 100 MB of application data, with an 
+expected growth of approximately 20\% per year as new users, listings, reservations, and related records are added. The 
+system will be designed to serve a single geographic region, rather than reproducing Airbnb's worldwide distribution, and 
+therefore no geographically distributed infrastructure will be required. These values provide a manageable workload for the 
+project while preserving the same types of constraints represented by the original Airbnb workload model: user concurrency, 
+request volume, peak behavior, response time, availability, data growth, and geographic scope.
