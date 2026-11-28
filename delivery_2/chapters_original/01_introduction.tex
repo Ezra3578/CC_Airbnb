@@ -1,0 +1,8 @@
+\section{Introduction}
+
+
+Delivery 1 describes an Airbnb-like application, where guests discover and reserve rental properties and hosts publish listings, prices, availability, and usage conditions. The system also includes authentication, role-based access, administrative operations, auditing, and customer support. The main architectural challenges are keeping availability accurate under concurrent booking attempts, protecting account and reservation data, and responding efficiently to read-heavy search traffic.
+
+The proposed architecture uses a service-oriented design with independently deployable services behind an API Gateway. The data architecture conforms the type of storage needed and what information it collects. As it is service oriented, each service specifies its architecture whether for data or software.
+
+For the academic simulation described in Delivery 1, the initial capacity target is 10 concurrent active users under normal conditions and 25 during peak conditions, approximately 500 requests per hour normally and 1,200 during peaks, a p95 response time below 2 seconds, and 99\% availability. Capacity figures in the service catalog are planning estimates and should be validated through load testing.  

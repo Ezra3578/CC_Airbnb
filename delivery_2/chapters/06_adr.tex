@@ -1,0 +1,87 @@
+\section{Architecture Decision Records}
+
+Each work stream records its most significant decision. All four are in
+status \emph{Proposed} (November 2026).
+
+\subsection{ADR-PAY-01: Hold the money at booking and capture it on confirmation}
+\begin{description}
+  \item[Context] Booking spans the Reservation Service, Payment Coordination,
+    the Ledger and a slow external gateway that cannot join a distributed
+    transaction. Dates are held for 10 minutes; a failed booking must never
+    leave the guest charged (proposed FR11).
+  \item[Decision] \textbf{Authorize} when the payment is requested,
+    \textbf{capture} on \texttt{Reservation\allowbreak Confirmed}, and \textbf{void} on
+    \texttt{Reservation\allowbreak Expired} or \texttt{Reservation\allowbreak Cancelled} before
+    capture.
+  \item[Alternatives] Charge immediately and refund on failure; a distributed
+    transaction; Payment Coordination confirming the reservation itself.
+  \item[Rationale] Releasing a hold is free and immediate, while a refund
+    costs fees and days; the gateway has no distributed transactions; reacting
+    to events keeps the Reservation Service as sole owner of the booking state.
+  \item[Consequences] One extra gateway call per booking; capture must happen
+    before the authorization expires; states converge within seconds; every
+    gateway operation is idempotent.
+\end{description}
+
+\subsection{ADR-RES-01: Prevent double bookings with a database exclusion constraint and expiring holds}
+\begin{description}
+  \item[Context] A listing must never be booked twice for overlapping dates
+    under concurrency ($\approx$130 bookings/s at real scale). Guests need
+    time to pay, but abandoned payments must not block the calendar (FR02,
+    FR04).
+  \item[Decision] Every active period is a calendar entry protected by a
+    PostgreSQL exclusion constraint on \texttt{(listing\_id, period)}. Booking
+    inserts a \texttt{HOLD} that expires after 10 minutes, released lazily, by
+    a scheduled message and by a sweeper, all idempotent.
+  \item[Alternatives] \texttt{SELECT ... FOR UPDATE} (relies on every code
+    path); a distributed cache lock (can fail mid-transaction); a version
+    column (does not cover ranges); pay first (may charge for lost dates).
+  \item[Consequences] Double bookings are impossible regardless of instances
+    or application bugs, and abandoned holds free themselves. In exchange the
+    design depends on range types and \texttt{btree\_gist}, a hot listing
+    serializes its bookings, and holds hide dates for up to 10 minutes.
+\end{description}
+
+\subsection{ADR-PRICE-01: Answer the multiplier synchronously from a precomputed zone snapshot}
+\begin{description}
+  \item[Context] FR03 requires a calculated price. The Reservation Service
+    needs the multiplier while the host saves a listing ($\approx$500\,ms
+    timeout) and Payments uses it as margin. Indicators come from sources with
+    very different rhythms: search events (60\,\% of traffic), the calendar
+    (daily) and an external events API (monthly).
+  \item[Decision] Two indicator services precompute demand and context per
+    zone and publish them as events to a local snapshot; each request is one
+    read of that snapshot and the active model version, which an administrator
+    must approve.
+  \item[Alternatives] Compute on request calling the indicator services and
+    SerpAPI; save the listing without a multiplier and set it later; a fixed
+    margin.
+  \item[Rationale] The first chains three services and an external API inside
+    500\,ms; the second leaves listings without a rate; the third ignores
+    demand and does not satisfy FR03.
+  \item[Consequences] Indicators may be a day (demand) or a month (context)
+    old, and a new model affects listings only when edited. In return the
+    engine is never on the booking or search path, survives indicator outages
+    with the last snapshot, and every multiplier can be explained from its
+    stored inputs.
+\end{description}
+
+\subsection{ADR-ID-01: Deliver notifications asynchronously with at-least-once delivery and idempotent consumers}
+\begin{description}
+  \item[Context] Notifications must not be duplicated, must handle failures
+    per channel, and sending a message, opening a case or changing an account
+    must not depend on external email, push or SMS providers.
+  \item[Decision] Producers publish through the outbox; Notification applies
+    preferences and templates and sends through per-channel queues with
+    retries, fallback and a dead-letter queue, using the key
+    \texttt{(eventId, userId, channel)} inserted with the outbound task.
+  \item[Alternatives] Send inside the request; let each service call the
+    providers; assume exactly-once delivery from the broker.
+  \item[Rationale] Asynchronous delivery isolates provider outages and allows
+    backpressure; exactly-once delivery cannot be assumed, so idempotent
+    consumers give an exactly-once \emph{effect}; the outbox removes dual
+    writes.
+  \item[Consequences] Delivery is eventual; every consumer must be
+    idempotent; ordering is per aggregate only; operators need tooling for the
+    dead-letter queue.
+\end{description}

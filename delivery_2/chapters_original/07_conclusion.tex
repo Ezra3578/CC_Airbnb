@@ -1,0 +1,5 @@
+\section{Conclusion}
+\label{ch:reflection}
+The proposed architecture separates transactional workflows from read-heavy discovery and non-critical side effects. Exclusive data ownership, synchronous validation for core user actions, and asynchronous events for search refresh and notifications provide a balance between correctness and responsiveness. Reservation and payment handling remain explicit stateful workflows because the external gateway and the platform cannot be assumed to share one atomic transaction.
+
+The design is intentionally cloud-independent and can be translated into infrastructure choices in Delivery 3. Before implementation, the team should validate the API contracts, finalize the exact payment/hold state machine, define retention and privacy rules, and test the reduced workload targets. The proposed service counts are initial estimates and must be adjusted based on observed latency, error rates, and resource utilization.

@@ -1,0 +1,21 @@
+\section{Introduction}
+
+Delivery~1 described an Airbnb-like application in which guests discover and
+book accommodations and hosts publish listings, prices, availability and usage
+conditions; it also includes authentication, role-based access, administration,
+auditing and customer support. The main architectural challenges are keeping
+availability correct under concurrent bookings, protecting account and payment
+data, and serving read-heavy search traffic efficiently.
+
+This delivery proposes a service-oriented architecture of independently
+deployable services behind an API Gateway, organized in four work streams:
+\emph{Payments and Refunds}, \emph{Reservation and Calendar}, \emph{Pricing
+Engine} and \emph{Identity, Communication and Internal Operations}. Each
+chapter first states the conventions shared by all services and then describes
+only what is specific to each work stream.
+
+The academic simulation targets 10 concurrent active users normally and 25 at
+peak (about 500 and 1,200 requests per hour), a p95 response time below
+2\,s and 99\,\% availability. Real-scale figures are used only to size the
+services; every capacity figure in this document is an estimate to be validated
+with load tests.

@@ -1,0 +1,97 @@
+\documentclass[12pt,a4paper]{article}
+
+% ---------------------------------
+% Packages
+% ---------------------------------
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{tabularx}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta}
+
+\usepackage[english]{babel}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{booktabs}
+\usepackage{xurl}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{float}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\usepackage{csquotes}
+\usepackage[
+    backend=biber,
+    sorting=none,
+    style=numeric
+]{biblatex}
+
+%Bibliography
+\addbibresource{references/bibliography.bib}
+
+% ---------------------------------
+% Configuration
+% ---------------------------------
+
+\geometry{
+    left=3cm,
+    right=3cm,
+    top=3cm,
+    bottom=3cm
+}
+
+\onehalfspacing{}
+\setlength{\emergencystretch}{3em}
+% Allow line breaks after underscores in long identifiers
+\let\origunderscore\_
+\renewcommand{\_}{\origunderscore\allowbreak}
+
+% ---------------------------------
+% Start of the document
+% ---------------------------------
+
+\begin{document}
+
+\title{Airbnb: Delivery 2}
+\author{Daniel Mateo Ballesteros Molina \\ 20221020102
+\and Santiago Gómez Reyes \\ 20221020098
+\and Esteban Alexander Bautista Solano \\ 20221020089
+\and Daniel David Cuellar Cangrejo \\ 20221020081
+\and Juan Andrés Jiménez Palomino \\ 20221020087}
+\date{November 2026}
+
+\maketitle
+
+\tableofcontents
+
+
+%Introduction
+\include{chapters/01_introduction}
+
+%System Context Diagram
+\include{chapters/02_system_context}
+
+%Software Architecture: Service Decomposition
+\include{chapters/03_software_architecture}
+
+%Data Architecture
+\include{chapters/04_data_architecture}
+
+%Communication Architecture
+\include{chapters/05_communication_architecture}
+
+%Architecture Decision Records
+\include{chapters/06_adr}
+
+%Conclusion
+\include{chapters/07_conclusion}
+
+
+%Bibliography
+\printbibliography
+
+
+\end{document}

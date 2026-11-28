@@ -1,0 +1,143 @@
+\section{Architecture Decision Records}
+
+%%% Texto introductorio a la sección
+
+
+%%%%%% COMO SOMOS 5, CADA UNO AGREGA UN ADR DE SU FRENTE
+
+% ------------------------- Payments and Refunds -------------------------
+\begingroup
+\setlength{\emergencystretch}{3em}
+\subsection{ADR-PAY-01 (Payments and Refunds): Hold the money at booking and capture it on confirmation}
+\begin{description}
+  \item[Status] Proposed --- 2026-11-25 (agreed contract with the Reservation
+    work stream: \texttt{POST /payments}, \texttt{Payment\allowbreak Succeeded},
+    reservation events).
+  \item[Context] A booking involves the Reservation Service, Payment
+    Coordination and the Ledger, each with its own database, plus an external
+    gateway that is slow and cannot join a distributed transaction. The
+    Reservation Service holds the dates for 10 minutes and confirms on
+    \texttt{Payment\allowbreak Succeeded}. A booking that fails must never leave the
+    guest charged (Book, alternative flows; proposed FR11).
+  \item[Decision] Payment Coordination \textbf{authorizes} (holds) the money
+    when the Reservation Service requests the payment and publishes
+    \texttt{Payment\allowbreak Succeeded}. It \textbf{captures} only when it receives
+    \texttt{Reservation\allowbreak Confirmed}, and \textbf{voids} the hold on
+    \texttt{Reservation\allowbreak Expired} or \texttt{Reservation\allowbreak Cancelled} before
+    capture.
+  \item[Alternatives] (1) Charge immediately and refund if the reservation
+    fails. (2) A distributed transaction across reservation, payment and
+    gateway. (3) Payment Coordination calls the Reservation Service to
+    confirm (a second orchestrator).
+  \item[Rationale] Charging first turns every lost hold into a refund that
+    costs fees and takes days to reach the guest; releasing a hold is free and
+    immediate. The gateway does not support distributed transactions. Reacting
+    to the reservation events keeps the Reservation Service as the only owner
+    of the booking state.
+  \item[Trade-offs] One more gateway call per booking (capture); an
+    authorization expires after some days, so capture must not be delayed;
+    states agree only after a few seconds.
+  \item[Consequences] Payment Coordination subscribes to the reservation
+    events; every operation (authorize, capture, void, refund) is idempotent.
+\end{description}
+\endgroup
+
+\subsection{ADR-PREV-DOB-BOOK: Prevent double bookings with a database exclusion constraint and expiring holds}
+\begin{description}
+  \item[Context]
+  An accommodation must never be booked twice for overlapping dates under
+  concurrent attempts (about 130 booking requests per second at real scale).
+  Guests need time to pay without losing the dates, but abandoned payments must
+  not block the calendar. Search is derived data and cannot decide
+  availability (FR02, FR04).
+  \item[Decision]
+  Every active period is a calendar entry protected by a PostgreSQL exclusion
+  constraint on \texttt{(listing\_id, period)}. Booking inserts a \texttt{HOLD}
+  that expires after 10 minutes; expired holds are released by lazy release, a
+  scheduled message and a sweeper, all idempotent. State changes are
+  conditional updates.
+  \item[Alternatives considered]
+  \texttt{SELECT ... FOR UPDATE} on the listing row (depends on every code path
+  following the protocol); a distributed lock in a cache (can fail
+  mid-transaction); a version column only (does not cover overlapping ranges);
+  pay first, then reserve (may charge for dates already gone). All rejected.
+  \item[Consequences]
+  \begin{itemize}
+    \item[+] Double bookings are impossible regardless of instance count or
+      application bugs; abandoned payments free the dates automatically.
+    \item[$-$] Depends on PostgreSQL range types and \texttt{btree\_gist}; a
+      hot listing serializes its bookings; holds hide dates for up to 10
+      minutes.
+  \end{itemize}
+\end{description}
+
+% ------------------------- Pricing Engine -------------------------
+\subsection{ADR-PRICE-01 (Pricing Engine): Answer the multiplier synchronously from a precomputed zone snapshot}
+\begin{description}
+  \item[Status] Proposed --- 2026-11-25 (contract with the Reservation work
+    stream: \texttt{POST /api/v1/pricing/multiplier} on listing create or
+    edit, calendar occupancy API).
+  \item[Context] FR03 requires the price of an accommodation to be
+    calculated. The Reservation Service needs the multiplier while the host
+    saves a listing (timeout of about 500\,ms; a failure returns
+    \texttt{502}), and Payments uses it as platform margin. The indicators
+    come from three sources with very different rhythms: search events
+    (60\,\% of the traffic), the calendar (daily) and an external events API
+    (monthly).
+  \item[Decision] Precompute demand and context indicators per zone in two
+    separate services, deliver them as events to a local snapshot in the
+    Pricing Service, and answer each multiplier request with one read of that
+    snapshot and the active model version. Model versions are activated only
+    after an administrator's approval (human supervision).
+  \item[Alternatives] (1) Compute on request, calling the indicator services
+    and SerpAPI synchronously. (2) Save the listing without a multiplier and
+    set it later through an event. (3) A fixed platform margin with no
+    engine.
+  \item[Rationale] Alternative 1 chains three services and an external API
+    inside a 500\,ms budget, so any of them could block listing saves.
+    Alternative 2 leaves listings without a rate and would need the
+    Reservation Service to consume and apply a new event. Alternative 3 does
+    not satisfy FR03 and ignores demand.
+  \item[Trade-offs] Indicators can be up to one day old (demand) or one
+    month old (context); one more derived copy (the snapshot) has to be
+    monitored; a new model version does not change existing listings until
+    they are edited.
+  \item[Consequences] The engine is never on the booking or search path; it
+    keeps working with the last snapshot if indicator services or the broker
+    fail, and it falls back to \texttt{STANDARD} (1.07) for zones without
+    data. Every calculation is stored with its inputs, so any multiplier can
+    be explained to a host or an auditor.
+\end{description}
+
+% ------------------------- Identity, Communication and Internal Operations -------------------------
+\begingroup
+\setlength{\emergencystretch}{3em}
+\subsection{ADR-ID-01 (Identity, Communication and Internal Operations): Deliver notifications asynchronously with at-least-once delivery and idempotent consumers}
+\begin{description}
+  \item[Status] Proposed --- 2026-11-26.
+  \item[Context] The Notification Service must send without duplicates and
+    handle failures per channel. Sending a message, creating a case or
+    changing an account must not depend on the availability of email, push
+    or SMS providers, which are external and can throttle or fail.
+  \item[Decision] Business services publish events through a transactional
+    outbox. Notification consumes them, applies preferences and templates, and
+    sends through per-channel queues with retries, fallback and a dead-letter
+    queue. Each notification has the key \texttt{(eventId, userId, channel)},
+    inserted in the same local transaction as the outbound task.
+  \item[Alternatives] (1) Send inside the originating request. (2) Let each
+    service call the providers directly. (3) Assume exactly-once delivery
+    from the broker.
+  \item[Rationale] Asynchronous delivery isolates provider latency and
+    outages and allows backpressure and retries. Exactly-once delivery cannot
+    be assumed, so idempotent consumers give an exactly-once \emph{effect}
+    on top of at-least-once delivery. The outbox removes the dual-write
+    failure between the database and the broker.
+  \item[Trade-offs] Delivery is eventual; duplicate suppression and
+    delivery-state tracking add complexity; operators need tools for the
+    dead-letter queue.
+  \item[Consequences] Every consumer must be idempotent; ordering is kept per
+    aggregate, not globally; failures are visible per channel; templates and
+    preferences become data owned by Notification.
+\end{description}
+
+\endgroup

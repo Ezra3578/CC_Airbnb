@@ -1,0 +1,15 @@
+\section{Conclusion}
+\label{ch:reflection}
+
+The architecture separates transactional workflows (booking, payment,
+identity) from read-heavy discovery and from side effects such as
+notifications, indicators and audit indexing. Exclusive data ownership,
+synchronous calls only where the user waits, and events delivered at least
+once to idempotent consumers balance correctness and responsiveness. Booking
+and payment remain an explicit saga because the platform and the external
+gateway cannot share an atomic transaction.
+
+The design is cloud-independent and will be mapped to infrastructure in
+Delivery~3. Before implementation the team must validate the API contracts,
+finalize the payment and hold state machine, define retention and privacy
+rules, and confirm the capacity estimates with load tests.
